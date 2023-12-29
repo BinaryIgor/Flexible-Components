@@ -30,18 +30,14 @@ router.get("/", (req, res) => {
     const script = `
     const inputWithError = document.getElementById("js-input");
 
-    inputWithError.onInputChanged = (value) => {
-        const error = validateName(value);
-        inputWithError.onInputValidated(error);
-    };
-
-
-    function validateName(name) {
+    inputWithError.inputValidator = (name) => {
         if (name && name.length > 1 && name.length <= 10) {
             return "";
         }
         return "Name needs to be between 2 and 10 characters";
-    }
+    };
+
+    inputWithError.setAttribute("input:value", "s");
     `;
 
     Web.returnHtml(res, Web.htmlPage(body, NAME, script, ["input-error"]));
