@@ -33,6 +33,12 @@ export const Components = {
         }
     },
 
+    createElementWithAttributes(elementType, attributes) {
+        const element = document.createElement(elementType);
+        this.setAttributes(element, attributes);
+        return element;
+    },
+
     attributeValueOrDefault(element, attribute, defaultValue = "") {
         const value = element.getAttribute(attribute);
         return value ? value : defaultValue;

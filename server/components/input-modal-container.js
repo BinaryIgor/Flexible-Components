@@ -8,7 +8,7 @@ export const router = express.Router();
 
 router.get("/", (req, res) => {
     const body = `
-    <input-modal-container title="Calories:" ok-text="Ok">
+    <input-modal-container title="Some Food Item" ok-text="Ok">
       <input-with-error 
         container:class="mx-4"
         input:type="text"
@@ -19,6 +19,16 @@ router.get("/", (req, res) => {
         input:hx-swap="outerHTML"
         input:hx-target="next input-error">
       </input-with-error>
+      <input-with-error 
+        container:class="mx-4 mt-4"
+        input:type="text"
+        input:name="protein"
+        input:placeholder="Input some protein..."
+        input:hx-post="${PATH}/validate-protein"
+        input:hx-trigger="input changed delay:500ms"
+        input:hx-swap="outerHTML"
+        input:hx-target="next input-error">
+        </input-with-error>
     </input-modal-container>
 
     <button id="show-input-modal">Show input modal</button>
@@ -37,6 +47,10 @@ router.get("/", (req, res) => {
             };
             inputModal.show();
         };
+
+        window.addEventListener("input-modal-container-hidden", e => {
+            console.log("Input modal container was hidden!");
+        });
     `;
 
     Web.returnHtml(res, Web.htmlPage(body, NAME, script, ["input-error", "input-with-error"]));

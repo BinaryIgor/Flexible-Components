@@ -7,24 +7,24 @@ const titleClassDefault = "text-2xl font-bold mb-2 px-4 pt-4";
 const closeClass = "absolute top-0 right-0";
 const closeClassDefault = "cursor-pointer text-3xl px-2";
 const cancelOkContainerClassDefault = "mt-4";
-const cancelClassDefault = "cursor-pointer text-lg";
-const okClassDefault = "cursor-pointer text-lg";
+const cancelClassDefault = "cursor-pointer text-lg ml-4";
+const okClassDefault = "cursor-pointer text-lg mr-4";
 
 const SHOW_EVENT = "show-input-modal-container";
 const HIDDEN_EVENT = "input-modal-container-hidden";
 
-//TODO: refactor to form container styles to avoid strange children behavior
 class InputModalContainer extends HTMLElement {
 
-    constructor() {
-        super();
-
+    connectedCallback() {
         this._hidden = !this.hasAttribute("visible");
 
         this._render();
 
         this.onCancel = () => this.hide();
         this.onOk = () => { };
+
+        window.addEventListener("click", this.hide);
+        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
 
     _render(title, cancel, ok) {
@@ -32,34 +32,69 @@ class InputModalContainer extends HTMLElement {
         const cancelToRender = cancel ? cancel : Components.attributeValueOrDefault(this, "cancel-text", "Cancel");
         const okToRender = ok ? ok : Components.attributeValueOrDefault(this, "ok-text", "Ok");
 
-        const containerAttributes = Components.mappedAttributes(this, "container", {
+        const containerAttributes = Components.mappedAttributesAsObject(this, "container", {
             toAddClass: containerClass,
             defaultClass: containerClassDefault
         });
-        const contentAttributes = Components.mappedAttributes(this, "content", {
+        const contentAttributes = Components.mappedAttributesAsObject(this, "content", {
             defaultClass: contentClassDefault
         });
 
-        const titleAttributes = Components.mappedAttributes(this, "title", { defaultClass: titleClassDefault });
+        const titleAttributes = Components.mappedAttributesAsObject(this, "title", { defaultClass: titleClassDefault });
 
         const closeIcon = Components.attributeValueOrDefault(this, "close-icon", "&times;");
-        const closeAttributes = Components.mappedAttributes(this, "close", {
+        const closeAttributes = Components.mappedAttributesAsObject(this, "close", {
             toAddClass: closeClass,
             defaultClass: closeClassDefault,
             toSkipAttributes: ["icon"]
         });
 
-        const cancelOkContainerAttributes = Components.mappedAttributes(this, "cancel-ok-container", {
+        const cancelOkContainerAttributes = Components.mappedAttributesAsObject(this, "cancel-ok-container", {
             defaultClass: cancelOkContainerClassDefault
         });
-        const cancelAttributes = Components.mappedAttributes(this, "cancel", {
+        const cancelAttributes = Components.mappedAttributesAsObject(this, "cancel", {
             toAddClass: cancelClassDefault
         });
-        const okAttributes = Components.mappedAttributes(this, "ok", {
+        const okAttributes = Components.mappedAttributesAsObject(this, "ok", {
             toAddClass: okClassDefault
         });
 
-        this.innerHTML = `
+        const container = Components.createElementWithAttributes("div", containerAttributes);
+        if (this._hidden) {
+            container.style = "display: none;";
+        }
+
+        const content = Components.createElementWithAttributes("div", contentAttributes);
+        content.style = "position: relative;";
+
+        const close = Components.createElementWithAttributes("span", closeAttributes);
+        close.innerHTML = closeIcon;
+
+        const titleEl = Components.createElementWithAttributes("div", titleAttributes);
+        titleEl.textContent = titleToRender;
+
+        content.append(close, titleEl);
+        content.append(...this.children);
+
+        container.append(content);
+
+        const cancelOkContainer = Components.createElementWithAttributes("div", cancelOkContainerAttributes);
+        cancelOkContainer.style = "display: flex; justify-content: space-between";
+
+        const cancelEl = Components.createElementWithAttributes("div", cancelAttributes);
+        cancelEl.textContent = cancelToRender;
+
+        const okEl = Components.createElementWithAttributes("div", okAttributes);
+        okEl.textContent = okToRender;
+
+        cancelOkContainer.append(cancelEl);
+        cancelOkContainer.append(okEl);
+
+        content.append(cancelOkContainer);
+
+        this.append(container);
+
+        `
         <div ${this._hidden ? `style="display: none;"` : ""} ${containerAttributes}>
             <div style="position: relative;" ${contentAttributes}>
                 <span ${closeAttributes}>${closeIcon}</span>
@@ -73,10 +108,10 @@ class InputModalContainer extends HTMLElement {
         </div>
         `;
 
-        this._container = this.querySelector("div");
-        this._close = this.querySelector("span");
-        this._cancel = Components.queryByCustomId(this, "cancel");
-        this._ok = Components.queryByCustomId(this, "ok");
+        this._container = container;
+        this._close = close;
+        this._cancel = cancelEl;
+        this._ok = okEl;
 
         this._showOnEvent = (e) => {
             const eDetail = e.detail;
@@ -97,15 +132,13 @@ class InputModalContainer extends HTMLElement {
             }
         };
 
-        this._close.onclick = () => this._container.style.display = "none";
+        this._close.onclick = () => {
+            this._container.style.display = "none";
+            window.dispatchEvent(new CustomEvent(HIDDEN_EVENT, { detail: { id: this.id } }));
+        };
 
         this._cancel.onclick = () => this.onCancel();
         this._ok.onclick = () => this.onOk();
-    }
-
-    connectedCallback() {
-        window.addEventListener("click", this.hide);
-        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
 
     disconnectedCallback() {
