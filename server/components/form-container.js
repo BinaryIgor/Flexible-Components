@@ -86,6 +86,9 @@ router.get("/", (req, res) => {
     `;
 
     const script = `
+        const withGenericErrorQueryParam = new URLSearchParams(window.location.search).get("withGenericError");
+        const withGenericError = withGenericErrorQueryParam == "true" ? true : false;
+
         const errorModal = document.getElementById("error-modal");
 
         const formContainer = document.querySelector("form-container");
@@ -99,8 +102,8 @@ router.get("/", (req, res) => {
             const form = document.getElementById("order-form");
             if (e.srcElement == form) {
                 const error = e.detail.failed ? e.detail.xhr.response : "";
-                formContainer.afterSubmit({error: error});
-                if (error) {
+                formContainer.afterSubmit({error: error, showGenericError: withGenericError });
+                if (error && !withGenericError) {
                     errorModal.show({message: error});
                 }
             }
