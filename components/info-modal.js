@@ -13,10 +13,34 @@ const HIDDEN_EVENT = "info-modal-hidden";
 
 class InfoModal extends HTMLElement {
 
-    constructor() {
-        super();
+    connectedCallback() {
         this._render();
+
+        this._showOnEvent = (e) => {
+            const eDetail = e.detail;
+            if (!this.id || this.id == eDetail.targetId) {
+                this.show(eDetail.title, eDetail.message);
+            }
+        }
+
+        // defined here because of the this for window listener issues
+        this.show = ({ title = "", message = "" } = {}) => {
+            this._render(title, message);
+            this._container.style.display = "block";
+            this._close.onclick = () => this._container.style.display = "none";
+        };
+
+        this.hide = e => {
+            if (e.target == this._container) {
+                this._container.style.display = "none";
+                window.dispatchEvent(new CustomEvent(HIDDEN_EVENT, { detail: { id: this.id } }));
+            }
+        };
+
+        window.addEventListener("click", this.hide);
+        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
+
 
     _render(title, message) {
         const titleToRender = title ? title : Components.attributeValueOrDefault(this, "title", "Default title");
@@ -51,32 +75,6 @@ class InfoModal extends HTMLElement {
 
         this._container = this.querySelector("div");
         this._close = this.querySelector("span");
-    }
-
-    connectedCallback() {
-        this._showOnEvent = (e) => {
-            const eDetail = e.detail;
-            if (!this.id || this.id == eDetail.targetId) {
-                this.show(eDetail.title, eDetail.message);
-            }
-        }
-
-        // defined here because of the this for window listener issues
-        this.show = ({ title = "", message = "" }) => {
-            this._render(title, message);
-            this._container.style.display = "block";
-            this._close.onclick = () => this._container.style.display = "none";
-        };
-
-        this.hide = e => {
-            if (e.target == this._container) {
-                this._container.style.display = "none";
-                window.dispatchEvent(new CustomEvent(HIDDEN_EVENT, { detail: { id: this.id } }));
-            }
-        };
-
-        window.addEventListener("click", this.hide);
-        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
 
     disconnectedCallback() {

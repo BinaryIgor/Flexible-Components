@@ -8,23 +8,24 @@ const messageClassDefault = "text-lg px-4";
 const closeClass = "absolute top-0 right-0";
 const closeClassDefault = "cursor-pointer text-3xl px-2";
 const cancelOkContainerClassDefault = "mt-4";
-const cancelClassDefault = "cursor-pointer text-lg";
-const okClassDefault = "cursor-pointer text-lg";
+const cancelClassDefault = "cursor-pointer text-lg ml-4";
+const okClassDefault = "cursor-pointer text-lg mr-4";
 
 const SHOW_EVENT = "show-confirmable-modal";
 const HIDDEN_EVENT = "confirmable-modal-hidden";
 
 class ConfirmableModal extends HTMLElement {
 
-    constructor() {
-        super();
-
+    connectedCallback() {
         this._hidden = !this.hasAttribute("visible");
 
         this._render();
 
         this.onCancel = () => this.hide();
         this.onOk = () => { };
+
+        window.addEventListener("click", this.hide);
+        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
 
     _render(title, message, cancel, ok) {
@@ -104,11 +105,6 @@ class ConfirmableModal extends HTMLElement {
 
         this._cancel.onclick = () => this.onCancel();
         this._ok.onclick = () => this.onOk();
-    }
-
-    connectedCallback() {
-        window.addEventListener("click", this.hide);
-        window.addEventListener(SHOW_EVENT, this._showOnEvent);
     }
 
     disconnectedCallback() {

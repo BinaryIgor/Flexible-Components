@@ -6,8 +6,7 @@ export class InputError extends HTMLElement {
 
     static observedAttributes = ["message"];
 
-    constructor() {
-        super();
+    connectedCallback() {
         const message = Components.attributeValueOrDefault(this, "message");
         this._render(message);
     }
@@ -21,5 +20,4 @@ export class InputError extends HTMLElement {
         this._render(newValue);
     }
 }
-
 customElements.define("input-error", InputError);

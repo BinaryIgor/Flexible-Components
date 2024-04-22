@@ -5,11 +5,7 @@ const inputClassDefault = "rounded p-2 border-2 border-solid border-slate-100 fo
 //Dependencies: registered input-error
 export class InputWithError extends HTMLElement {
 
-    static observedAttributes = ["input:value"];
-
-    constructor() {
-        super();
-
+    connectedCallback() {
         const containerAttributes = Components.mappedAttributes(this, "container");
         const inputAttributes = Components.mappedAttributes(this, "input", {
             defaultClass: inputClassDefault
@@ -37,17 +33,10 @@ export class InputWithError extends HTMLElement {
                 this.onInputValidated(error);
             }
         };
-    }
 
-    connectedCallback() {
         this._input.addEventListener("input", e => {
             this.onInputChanged(this._input.value);
         });
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        this._input.value = newValue;
-        this.onInputChanged(newValue);
     }
 }
 

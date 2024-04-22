@@ -13,6 +13,7 @@ const okClassDefault = "cursor-pointer text-lg";
 const SHOW_EVENT = "show-input-modal-container";
 const HIDDEN_EVENT = "input-modal-container-hidden";
 
+//TODO: refactor to form container styles to avoid strange children behavior
 class InputModalContainer extends HTMLElement {
 
     constructor() {

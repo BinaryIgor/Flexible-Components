@@ -5,31 +5,39 @@ const hiddenClass = "hidden";
 
 class FormContainer extends HTMLElement {
 
-    constructor() {
-        super();
-
-        const errorAttributes = Components.mappedAttributes(this, "generic-error", {
+    connectedCallback() {
+        const formAttributes = Components.mappedAttributesAsObject(this, "form");
+        const errorAttributes = Components.mappedAttributesAsObject(this, "generic-error", {
             defaultClass: genericErrorClassDefault,
             toAddClass: hiddenClass
         });
-        const formAttributes = Components.mappedAttributes(this, "form");
-        const submitAttributes = Components.mappedAttributes(this, "submit", {
+        const submitAttributes = Components.mappedAttributesAsObject(this, "submit", {
             defaultAttributes: {
                 value: "Submit"
             }
         });
 
-        this.innerHTML = `
-        <form ${formAttributes}>
-        ${this.innerHTML}
-        <p ${Components.renderedCustomIdAttribute("generic-error")} ${errorAttributes}></p>
-        <input type="submit" ${submitAttributes}>
-        </form>
-        `;
+        const form = document.createElement("form");
+        Components.setAttributes(form, formAttributes);
 
-        this._genericError = Components.queryByCustomId(this, "generic-error");
-        this._form = this.querySelector("form");
-        this._submit = this.querySelector(`input[type="submit"]`);
+        form.append(...this.children);
+
+        const genericError = document.createElement("p");
+        Components.setAttributes(genericError, errorAttributes);
+
+        form.append(genericError);
+
+        const submit = document.createElement("input");
+        submit.setAttribute("type", "submit");
+        Components.setAttributes(submit, submitAttributes);
+
+        form.append(submit);
+
+        this.append(form);
+
+        this._genericError = genericError;
+        this._form = form;
+        this._submit = submit;
 
         this._form.addEventListener("submit", e => {
             this._submit.disabled = true;
@@ -45,7 +53,6 @@ class FormContainer extends HTMLElement {
     }
 
     afterSubmit({ error = "", alwaysClearInputs = false, showGenericError = false}) {
-        console.log("After submit, error:", error);
         this._submit.disabled = false;
 
         if (alwaysClearInputs || !error) {

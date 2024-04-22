@@ -4,6 +4,9 @@
 
 Configurable, framework agnostic (Web Components!), copy-paste components with full CSS control, perfectly suited for the HTMX (and other) usage.
 
+The only dependency:
+* Tailwind CSS
+
 Inspired by:
 * https://github.com/AleksanderTech/snaplo
 * https://github.com/bigskysoftware/htmx
