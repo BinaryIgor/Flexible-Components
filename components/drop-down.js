@@ -8,10 +8,10 @@ const defaultDropdownOptionClass = "bg-slate-100 py-2 px-4 text-right";
 
 const MAX_OPTIONS = 100;
 
-class SingleSelectDropdown extends HTMLElement {
+class DropDown extends HTMLElement {
 
     connectedCallback() {
-        const title = Components.attributeValueOrDefault(this, "title", "Single Select Dropdown");
+        const title = Components.attributeValueOrDefault(this, "title", "Drop Down");
 
         this._hideOptionsOnSelected = Components.attributeValueOrDefault(this, "hide-options-on-selected", true);
 
@@ -62,7 +62,7 @@ class SingleSelectDropdown extends HTMLElement {
                 }
 
                 console.log("Option chosen!", li);
-                this.dispatchEvent(new CustomEvent("single-select-dropdown-option-chosen", {
+                this.dispatchEvent(new CustomEvent("drop-down-option-chosen", {
                     detail: { text: li.textContent, dataId: li.getAttribute("data-id") }
                 }));
             };
@@ -70,4 +70,4 @@ class SingleSelectDropdown extends HTMLElement {
     }
 }
 
-customElements.define("single-select-dropdown", SingleSelectDropdown);
+customElements.define("drop-down", DropDown);

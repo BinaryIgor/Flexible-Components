@@ -1,31 +1,31 @@
 import express from "express";
 import * as Web from '../shared/web.js';
 
-export const NAME = "single-select-dropdown";
-export const PATH = "/single-select-dropdown";
+export const NAME = "drop-down";
+export const PATH = "/drop-down";
 
 export const router = express.Router();
 
 router.get("/", (req, res) => {
     const body = `
-        <single-select-dropdown title="Some Custom Title"
-            id="single-select-dropdown"
+        <drop-down title="Some Custom Title"
+            id="drop-down"
             option-0-text="A"
             option-0:data-id="A-1"
             option-0:hx-get="${PATH}/option-0"
             option-0:hx-push-url="true"
-            option-0:hx-target="#single-select-dropdown"
+            option-0:hx-target="#drop-down"
             option-1-text="B"
             option-1:data-id="B-1">
-        </single-select-dropdown>
+        </drop-down>
     `;
 
     const script = `
         console.log("Some script...");
 
-        const dropdown = document.querySelector("single-select-dropdown");
+        const dropdown = document.querySelector("drop-down");
 
-        dropdown.addEventListener("single-select-dropdown-option-chosen", e => {
+        dropdown.addEventListener("drop-down-option-chosen", e => {
             console.log("Option chosen...", e.detail);
             // dropdown.hideOptions();
         });
