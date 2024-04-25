@@ -15,19 +15,7 @@ class DropDown extends HTMLElement {
 
         this._hideOptionsOnSelected = Components.attributeValueOrDefault(this, "hide-options-on-selected", true);
 
-        const optionItems = [];
-
-        for (let i = 0; i < MAX_OPTIONS; i++) {
-            const optionId = `option-${i}`;
-            const optionTitle = this.getAttribute(`${optionId}-text`);
-            if (!optionTitle) {
-                break;
-            }
-            const optionAttributes = Components.mappedAttributes(this, optionId, {
-                defaultClass: defaultDropdownOptionClass
-            });
-            optionItems.push(`<li ${optionAttributes}">${optionTitle}</li>`);
-        }
+        const optionItems = this._optionItemsFromAttributesOrProperty();
 
         const optionsHTML = optionItems.join("\n");
 
@@ -67,6 +55,51 @@ class DropDown extends HTMLElement {
                 }));
             };
         });
+    }
+
+    _optionItemsFromAttributesOrProperty() {
+        if (this.options) {
+            return this._optionItemsFromPropery(this.options);
+        }
+        return this._optionItemsFromAttributes();
+    }
+
+    _optionItemsFromPropery(options) {
+        const optionItems = [];
+
+        for (let o of options) {
+            const optionAttributes = Components.mappedAttributes(this, "option", {
+                defaultAttributes: {
+                    "data-id": o.id
+                },
+                defaultClass: defaultDropdownOptionClass
+            });
+            optionItems.push(this._optionItemHtml(optionAttributes, o.title));
+        }
+
+        return optionItems;
+    }
+
+    _optionItemHtml(attributes, title) {
+        return `<li ${attributes}">${title}</li>`;
+    }
+
+    _optionItemsFromAttributes() {
+        const optionItems = [];
+
+        for (let i = 0; i < MAX_OPTIONS; i++) {
+            const optionId = `option-${i}`;
+            const optionTitle = this.getAttribute(`${optionId}-text`);
+            if (!optionTitle) {
+                break;
+            }
+            const optionAttributes = Components.mappedAttributes(this, optionId, {
+                defaultClass: defaultDropdownOptionClass
+            });
+            optionItems.push(this._optionItemHtml(optionAttributes, optionTitle));
+        }
+
+        return optionItems;
     }
 }
 
