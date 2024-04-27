@@ -13,15 +13,14 @@ export function htmlPage(body, component, script="", additionalComponents=[]) {
         <head>
             <title>Flexible Web Components: ${component}</title>
             <link href="${CSS_PATH}" rel="stylesheet">
-        </head>
-        <body class="m-4">
-            <h1 class="text-3xl font-bold mb-8">Flexible Web Components: ${component}</h1>
-
-            ${body}
-
-            ${HTMX_SCRIPT}
             <script type="module" src="${component}.js"></script>
             ${additionalComponents.map(c => `<script type="module" src="${c}.js"></script>`).join("\n")}
+            ${HTMX_SCRIPT}
+        </head>
+        <body class="m-4" id="app">
+            <h1 class="text-3xl font-bold mb-8">Flexible Web Components: ${component}</h1>
+            ${body}
+
             <script>${script}</script>
         </body>
     <html>`;

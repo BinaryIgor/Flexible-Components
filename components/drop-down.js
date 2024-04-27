@@ -2,19 +2,21 @@ import { Components } from "./base.js";
 
 const hiddenClass = "hidden";
 
-const containerClassDefault = "whitespace-nowrap cursor-pointer text-xl w-fit";
-const titleClassDefault = "text-xl py-2";
-const optionsClassDefault = "top-8 right-0 w-full space-y-1 overflow-auto max-h-[90vh]";
-const optionClassDefault = "py-2 px-4 text-right rounded bg-slate-50";
+const defaultContainerClass = "cursor-pointer text-xl w-fit";
+const defaultTitleClass = "text-xl py-2";
+const defaultOptionsClass = "w-full space-y-1 overflow-auto max-h-[90vh]";
+const defaultOptionClass = "py-2 px-2 text-right rounded bg-slate-50";
 
 const attributes = {
     hideOptionsOnOutsideClick: "hide-options-on-outside-click",
-    hideOptionsOnSelected: "hide-options-on-selected"
+    hideOptionsOnSelected: "hide-options-on-selected",
+    optionsZIndex: "options-z-index"
 };
 
 const optionDataId = "data-id";
 
 const elements = {
+    container: "container",
     title: "title",
     options: "options",
     option: "option",
@@ -23,7 +25,7 @@ const elements = {
     }
 };
 
-const MAX_OPTIONS = 100;
+const maxOptions = 100;
 
 class DropDown extends HTMLElement {
 
@@ -35,13 +37,16 @@ class DropDown extends HTMLElement {
     }
 
     connectedCallback() {
-        const title = Components.attributeValueOrDefault(this, "title", "Drop Down");
-        const titleAttributes = Components.mappedAttributes(this, elements.title, { defaultClass: titleClassDefault });
+        const containerAttributes = Components.mappedAttributes(this, elements.container, { defaultClass: defaultContainerClass });
+
+        const title = Components.attributeValueOrDefault(this, "title", "DropDown");
+        const titleAttributes = Components.mappedAttributes(this, elements.title, { defaultClass: defaultTitleClass });
 
         const optionsAttributes = Components.mappedAttributes(this, elements.options, {
-            defaultClass: optionsClassDefault,
+            defaultClass: defaultOptionsClass,
             toAddClass: hiddenClass
         });
+        const optionsZIndex = Components.attributeValueOrDefault(this, attributes.optionsZIndex, "99");
 
         this._hideOptionsOnOutsideClick = Components.attributeBooleanValueOrDefault(this, attributes.hideOptionsOnOutsideClick, true);
         this._hideOptionsOnSelected = Components.attributeBooleanValueOrDefault(this, attributes.hideOptionsOnSelected, true);
@@ -49,9 +54,9 @@ class DropDown extends HTMLElement {
         const optionsHTML = this._optionItemsHTML();
 
         this.innerHTML = `
-        <div class="relative ${containerClassDefault}">
+        <div style="position: relative;" ${containerAttributes}>
             <div ${titleAttributes}>${title}</div>
-            <ul style="z-index: 999" ${optionsAttributes}>
+            <ul style="position: absolute; z-index: ${optionsZIndex}" ${optionsAttributes}>
                 ${optionsHTML}
             </ul>
         </div>
@@ -72,16 +77,15 @@ class DropDown extends HTMLElement {
         };
 
         this._hideOptionsIfOutside = (e) => {
-            if (e.target != container && e.target.parentNode != container) {
+            if (this._hideOptionsOnOutsideClick &&
+                e.target != container && e.target.parentNode != container) {
                 options.classList.add(hiddenClass);
             }
         };
 
         this._setOptionItemsOnClick();
 
-        if (this._hideOptionsOnOutsideClick == true) {
-            window.addEventListener("click", this._hideOptionsIfOutside);
-        }
+        window.addEventListener("click", this._hideOptionsIfOutside);
     }
 
     _optionItemsHTML() {
@@ -97,45 +101,48 @@ class DropDown extends HTMLElement {
     _optionItemsFromPropery(options) {
         const optionItems = [];
 
-        const optionDefaultAttributes = Components.mappedAttributesAsObject(this, elements.option, {
-            defaultClass: optionClassDefault
+        const defaultOptionAttributes = Components.mappedAttributesAsObject(this, elements.option, {
+            defaultClass: defaultOptionClass
         });
 
         for (let i = 0; i < options.length; i++) {
             const o = options[i];
+
+            const defaultAttributes = { ...defaultOptionAttributes };
+            if (o.dataId) {
+                defaultAttributes[optionDataId] = o.dataId;
+            }
             const optionAttributes = Components.mappedAttributes(this, elements.optionOfIdx(i), {
-                defaultAttributes: {
-                    ...optionDefaultAttributes,
-                    optionDataId: o.id
-                }
+                defaultAttributes: defaultAttributes
             });
-            optionItems.push(this._optionItemHtml(optionAttributes, o.title));
+
+            optionItems.push(this._optionItemHTML(optionAttributes, o.title));
         }
 
         return optionItems;
     }
 
-    _optionItemHtml(attributes, title) {
+    _optionItemHTML(attributes, title) {
         return `<li ${attributes}">${title}</li>`;
     }
 
     _optionItemsFromAttributes() {
         const optionItems = [];
 
-        const optionDefaultAttributes = Components.mappedAttributesAsObject(this, elements.option, {
-            defaultClass: optionClassDefault
+        const defaultOptionAttributes = Components.mappedAttributesAsObject(this, elements.option, {
+            defaultClass: defaultOptionClass
         });
 
-        for (let i = 0; i < MAX_OPTIONS; i++) {
+        for (let i = 0; i < maxOptions; i++) {
             const optionId = elements.optionOfIdx(i);
             const optionTitle = this.getAttribute(`${optionId}-text`);
             if (!optionTitle) {
                 break;
             }
             const optionAttributes = Components.mappedAttributes(this, optionId, {
-                defaultAttributes: optionDefaultAttributes
+                defaultAttributes: defaultOptionAttributes
             });
-            optionItems.push(this._optionItemHtml(optionAttributes, optionTitle));
+            optionItems.push(this._optionItemHTML(optionAttributes, optionTitle));
         }
 
         return optionItems;
@@ -154,7 +161,7 @@ class DropDown extends HTMLElement {
                 this.dispatchEvent(new CustomEvent("drop-down-option-chosen", {
                     detail: {
                         text: li.textContent,
-                        id: li.getAttribute(optionDataId)
+                        dataId: li.getAttribute(optionDataId)
                     }
                 }));
             };
@@ -162,9 +169,7 @@ class DropDown extends HTMLElement {
     }
 
     disconnectedCallback() {
-        if (this._hideOptionsOnOutsideClick == true) {
-            window.removeEventListener("click", this._hideOptionsIfOutside);
-        }
+        window.removeEventListener("click", this._hideOptionsIfOutside);
     }
 }
 

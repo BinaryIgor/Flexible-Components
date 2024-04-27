@@ -10,7 +10,7 @@ import * as InputWithErrorComponent from './components/input-with-error.js';
 import * as FormContainerComponent from './components/form-container.js';
 import * as InputModalContainerComponent from './components/input-modal-container.js';
 import * as ExperimentsComponent from './components/experiments.js';
-import * as Dropdown from './components/drop-down.js';
+import * as DropDown from './components/drop-down.js';
 
 const SERVER_PORT = process.env.SERVER_PORT || 8080;
 const CSS_PATH = path.join("dist", "style.css");
@@ -21,7 +21,7 @@ const components = fs.readdirSync(COMPONENTS_DIR);
 const availableComponentsPaths = [
     InfoModalComponent.PATH, ConfirmableModalComponent.PATH,
     InputWithErrorComponent.PATH, FormContainerComponent.PATH, InputModalContainerComponent.PATH,
-    Dropdown.PATH,
+    DropDown.PATH,
     ExperimentsComponent.PATH];
 
 console.log();
@@ -40,7 +40,7 @@ app.use(ConfirmableModalComponent.PATH, ConfirmableModalComponent.router);
 app.use(InputWithErrorComponent.PATH, InputWithErrorComponent.router);
 app.use(FormContainerComponent.PATH, FormContainerComponent.router);
 app.use(InputModalContainerComponent.PATH, InputModalContainerComponent.router);
-app.use(Dropdown.PATH, Dropdown.router);
+app.use(DropDown.PATH, DropDown.router);
 app.use(ExperimentsComponent.PATH, ExperimentsComponent.router);
 
 app.get("*", async (req, res) => {
