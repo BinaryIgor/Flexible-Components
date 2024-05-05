@@ -44,6 +44,11 @@ export const Components = {
         return value ? value : defaultValue;
     },
 
+    attributeBooleanValueOrDefault(element, attribute, defaultValue = false) {
+        const value = this.attributeValueOrDefault(element, attribute, defaultValue);
+        return value.toString() == 'true';
+    },
+
     queryByCustomId(element, value) {
         return element.querySelector(`[data-custom-id="${value}"]`);
     },
