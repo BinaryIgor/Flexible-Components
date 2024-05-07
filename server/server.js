@@ -4,11 +4,9 @@ import fs from "fs";
 import path from "path";
 
 import * as Web from "./shared/web.js";
-import * as InfoModalComponent from './components/info-modal.js';
-import * as ConfirmableModalComponent from './components/confirmable-modal.js';
 import * as InputWithErrorComponent from './components/input-with-error.js';
 import * as FormContainerComponent from './components/form-container.js';
-import * as InputModalContainerComponent from './components/input-modal-container.js';
+import * as ModalContainerComponent from './components/modal-container.js';
 import * as ExperimentsComponent from './components/experiments.js';
 import * as DropDown from './components/drop-down.js';
 
@@ -19,8 +17,7 @@ const COMPONENTS_DIR = '../components';
 const components = fs.readdirSync(COMPONENTS_DIR);
 
 const availableComponentsPaths = [
-    InfoModalComponent.PATH, ConfirmableModalComponent.PATH,
-    InputWithErrorComponent.PATH, FormContainerComponent.PATH, InputModalContainerComponent.PATH,
+    InputWithErrorComponent.PATH, FormContainerComponent.PATH, ModalContainerComponent.PATH,
     DropDown.PATH,
     ExperimentsComponent.PATH];
 
@@ -35,11 +32,9 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(InfoModalComponent.PATH, InfoModalComponent.router);
-app.use(ConfirmableModalComponent.PATH, ConfirmableModalComponent.router);
 app.use(InputWithErrorComponent.PATH, InputWithErrorComponent.router);
 app.use(FormContainerComponent.PATH, FormContainerComponent.router);
-app.use(InputModalContainerComponent.PATH, InputModalContainerComponent.router);
+app.use(ModalContainerComponent.PATH, ModalContainerComponent.router);
 app.use(DropDown.PATH, DropDown.router);
 app.use(ExperimentsComponent.PATH, ExperimentsComponent.router);
 
