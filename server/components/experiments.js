@@ -12,6 +12,12 @@ router.get("/", (req, res) => {
       <custom-message category="Curiosities" message="Some interesting message">
       </custom-message>
     </div>
+
+    <button id="fade-in-out" class="block my-8">Fade in/out</button>
+
+    <div id="to-fade-in-out" class="mt-8" style="display: none">
+        Fade me in/out
+    </div>
     `;
 
     const script = `
@@ -26,6 +32,22 @@ router.get("/", (req, res) => {
         setTimeout(() => {
             customMessageContainer.innerHTML = "Gone";
         }, 2000);
+
+        const toFadeInOut = document.getElementById("to-fade-in-out");
+        let fadeIn = true;
+
+        document.getElementById("fade-in-out").onclick = () => {
+            if (fadeIn) {
+                toFadeInOut.classList.remove("fade-out");
+                toFadeInOut.style = "display: block";
+                toFadeInOut.classList.add("fade-in");
+            } else {
+                toFadeInOut.classList.remove("fade-in");
+                toFadeInOut.classList.add("fade-out");
+                setTimeout(() => toFadeInOut.style = "display: none", 1000);
+            }
+            fadeIn = !fadeIn;
+        };
     `;
 
     Web.returnHtml(res, Web.htmlPage(body, NAME, script));

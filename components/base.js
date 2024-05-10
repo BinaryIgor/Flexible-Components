@@ -4,12 +4,11 @@ export const Components = {
             defaultClass = "",
             toAddAttributes = {},
             toAddClass = "",
-            toSkipAttributes = [],
-            keepId = false } = {}) {
+            toSkipAttributes = [] } = {}) {
 
         let baseAttributes = baseAtrributesFromDefaults(defaultAttributes, defaultClass);
 
-        let mappedAttributes = mappedAttributesWithDefaults(element, elementId, baseAttributes, toSkipAttributes, keepId);
+        let mappedAttributes = mappedAttributesWithDefaults(element, elementId, baseAttributes, toSkipAttributes);
 
         return mappedAttributesWithToAddValues(mappedAttributes, toAddAttributes, toAddClass);
     },
@@ -19,10 +18,9 @@ export const Components = {
             defaultClass = "",
             toAddAttributes = {},
             toAddClass = "",
-            toSkipAttributes = [],
-            keepId = false } = {}) {
+            toSkipAttributes = [] } = {}) {
         const attributes = this.mappedAttributesAsObject(element, elementId,
-            { defaultAttributes, defaultClass, toAddAttributes, toAddClass, toSkipAttributes, keepId })
+            { defaultAttributes, defaultClass, toAddAttributes, toAddClass, toSkipAttributes })
 
         return Object.entries(attributes).map(e => `${e[0]}="${e[1]}"`).join("\n");
     },
@@ -70,24 +68,29 @@ function baseAtrributesFromDefaults(defaultAttributes, defaultClass) {
     return defaultAttributes;
 }
 
-function mappedAttributesWithDefaults(element, elementId, defaultAttributes, toSkipAttributes, keepId) {
-    const replacePrefix = `${elementId}:`;
+function mappedAttributesWithDefaults(element, elementId, defaultAttributes, toSkipAttributes) {
+    const overridePrefix = `${elementId}:`;
     const addPrefix = `${elementId}:add:`;
+    const replacePrefix = `${elementId}:replace:`;
 
     const toMapAttributes = element.getAttributeNames()
-        .filter(a => a.startsWith(replacePrefix) || a.startsWith(addPrefix));
+        .filter(a => a.startsWith(overridePrefix) || a.startsWith(addPrefix) || a.startsWith(replacePrefix));
 
     const mappedAttributes = { ...defaultAttributes };
 
     toMapAttributes.forEach(a => {
         let targetKey;
-        let add;
+        let add = false;
+        let replace = false;
         if (a.startsWith(addPrefix)) {
             add = true;
-            targetKey = keepId ? a : a.replace(addPrefix, "");
+            targetKey = a.replace(addPrefix, "");
+        } else if (a.startsWith(replacePrefix)) {
+            replace = true;
+            targetKey = a.replace(replacePrefix, "");
         } else {
             add = false;
-            targetKey = keepId ? a : a.replace(replacePrefix, "");
+            targetKey = a.replace(overridePrefix, "");
         }
 
         if (toSkipAttributes.includes(targetKey)) {
@@ -102,6 +105,15 @@ function mappedAttributesWithDefaults(element, elementId, defaultAttributes, toS
             } else {
                 mappedAttributes[targetKey] = newValue;
             }
+        } else if (replace && mappedAttributes[targetKey]) {
+            const patterns = element.getAttribute(a).split(" ");
+            patterns.forEach(p => {
+                const pattern = p.split("=");
+                const old = pattern[0];
+                const replacement = pattern.length > 1 ? pattern[1] : "";
+                const prevValue = mappedAttributes[targetKey];
+                mappedAttributes[targetKey] = prevValue.replace(old, replacement);
+            });
         } else {
             mappedAttributes[targetKey] = element.getAttribute(a);
         }

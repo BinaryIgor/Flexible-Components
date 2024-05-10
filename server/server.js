@@ -40,8 +40,11 @@ app.use(ExperimentsComponent.PATH, ExperimentsComponent.router);
 
 app.get("*", async (req, res) => {
     try {
-        if (req.url.includes(".css")) {
-            Web.returnCss(res, await staticFileContentOfPath(CSS_PATH));
+        if (req.url.startsWith("/assets")) {
+            const filePath = req.url.substring(1);
+            await Web.returnFile(res, filePath);
+        } else if (req.url.includes(".css")) {
+            await Web.returnFile(res, CSS_PATH);
         } else if (req.url.includes(".js")) {
             const componentFile = components.find(c => req.url.endsWith(c));
             if (componentFile) {
@@ -63,8 +66,7 @@ function staticFileContentOfPath(path) {
 }
 
 async function returnComponent(res, filename) {
-    const content = await staticFileContentOfPath(path.join(COMPONENTS_DIR, filename));
-    Web.returnJs(res, content);
+    await Web.returnFile(res, path.join(COMPONENTS_DIR, filename));
 }
 
 app.listen(SERVER_PORT, () => {

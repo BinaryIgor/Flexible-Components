@@ -8,6 +8,7 @@ const defaultOptionsClass = "w-full space-y-1 overflow-auto max-h-[90vh]";
 const defaultOptionClass = "py-2 px-2 text-right rounded bg-slate-50";
 
 const attributes = {
+    title: "title",
     hideOptionsOnOutsideClick: "hide-options-on-outside-click",
     hideOptionsOnSelected: "hide-options-on-selected",
     optionsZIndex: "options-z-index"
@@ -29,6 +30,8 @@ const maxOptions = 100;
 
 class DropDown extends HTMLElement {
 
+    static observedAttributes = [attributes.title];
+
     set options(options) {
         this._options = options;
         const optionsHTML = this._optionItemsHTML();
@@ -39,7 +42,7 @@ class DropDown extends HTMLElement {
     connectedCallback() {
         const containerAttributes = Components.mappedAttributes(this, elements.container, { defaultClass: defaultContainerClass });
 
-        const title = Components.attributeValueOrDefault(this, "title", "DropDown");
+        const title = Components.attributeValueOrDefault(this, attributes.title, "DropDown");
         const titleAttributes = Components.mappedAttributes(this, elements.title, { defaultClass: defaultTitleClass });
 
         const optionsAttributes = Components.mappedAttributes(this, elements.options, {
@@ -61,6 +64,8 @@ class DropDown extends HTMLElement {
             </ul>
         </div>
         `;
+
+        this._titleElement = this.querySelectorAll("div")[1];
 
         const options = this.querySelector("ul");
         this._optionsElement = options;
@@ -123,7 +128,7 @@ class DropDown extends HTMLElement {
     }
 
     _optionItemHTML(attributes, title) {
-        return `<li ${attributes}">${title}</li>`;
+        return `<li ${attributes}>${title}</li>`;
     }
 
     _optionItemsFromAttributes() {
@@ -166,6 +171,12 @@ class DropDown extends HTMLElement {
                 }));
             };
         });
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name == attributes.title && this._titleElement) {
+            this._titleElement.textContent = newValue;
+        }
     }
 
     disconnectedCallback() {

@@ -17,11 +17,10 @@ npm run build:run
 Output logs will guide you:
 ```
 Available components: 
-* http://localhost:8080/info-modal
-* http://localhost:8080/confirmable-modal
 * http://localhost:8080/input-with-error
 * http://localhost:8080/form-container
-* http://localhost:8080/input-modal-container
+* http://localhost:8080/modal-container
+* http://localhost:8080/drop-down
 * http://localhost:8080/experiments
 
 Server has started on port 8080!
@@ -78,8 +77,12 @@ Some examples of naming conventions:
     error:class="italic text-lg text-red-600">
 </input-with-error>
 
-<info-modal id="error-modal" title:add:class="text-red-500">
-</info-modal>
+<modal-container 
+    id="error-modal" 
+    title:add:class="text-red-500"
+    with-left-right-buttons="false">
+    <div class="px-4 pb-16">Some error information...</div>
+</modal-container>
 ```
 Basically:
 * `{element}:{attribute}` will set *attribute* on *element* inside Web Component

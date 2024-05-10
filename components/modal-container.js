@@ -1,145 +1,194 @@
 import { Components } from "./base.js";
 
-// Chrome black border
-const dialogClassDefault = "backdrop:bg-black/50 outline-none focus-none rounded-md max-w-lg w-11/12";
-const titleClassDefault = "text-2xl font-bold p-2";
-const closeClass = "absolute top-0 right-0";
-const closeClassDefault = "cursor-pointer text-3xl px-2";
-const leftRightButtonsContainerClassDefault = "mt-2";
-const leftButtonClassDefault = "cursor-pointer text-lg pl-2 pr-4 py-2";
-const rightButtonClassDefault = "cursor-pointer text-lg pl-4 pr-2 py-2";
+const defaultContainerZIndex = "10";
+const defaultContainerClass = "bg-black/70";
+const defaultContentClass = "max-w-lg w-11/12 rounded top-1/2 left-1/2 absolute -translate-x-1/2 -translate-y-1/2 bg-white";
+const defaultTitleClass = "text-xl font-bold p-4";
+const defaultCloseClass = "cursor-pointer text-4xl px-2";
+const defaultCloseIcon = "&times;";
+const defaultLeftRightButtonClass = "cursor-pointer text-lg p-4";
 
-const HIDDEN_EVENT = "modal-container-hidden";
+const attributes = {
+    containerZIndex: "container-z-index",
+    title: "title",
+    withClose: "with-close",
+    closeIcon: "close-icon",
+    withLeftRightButtons: "with-left-right-buttons",
+    withLeftButton: "with-left-button",
+    withRightButton: "with-right-button",
+    leftButtonText: "left-button-text",
+    rightButtonText: "right-button-text",
+    hideOnOutsideClick: "hide-on-outside-click"
+};
 
-const TITLE_ATTRIBUTE = "title";
+const elements = {
+    container: "container",
+    content: "content",
+    title: "title",
+    close: "close",
+    leftRightButtonsContainer: "left-right-buttons-container",
+    leftButton: "left-button",
+    rightButton: "right-button"
+};
 
 class ModalContainer extends HTMLElement {
 
-    static observedAttributes = [TITLE_ATTRIBUTE];
+    static observedAttributes = [attributes.title];
 
     connectedCallback() {
         this._render();
+        this._initProperties();
 
+        const hideOnOutsideClick = Components.attributeBooleanValueOrDefault(this, attributes.hideOnOutsideClick, false);
+        if (hideOnOutsideClick) {
+            this._container.addEventListener("click", this.hide);
+        }
+    }
+
+    _render() {
+        const title = Components.attributeValueOrDefault(this, attributes.title, "Modal Container");
+
+        const containerAttributes = Components.mappedAttributesAsObject(this, elements.container, {
+            defaultClass: defaultContainerClass
+        });
+        const contentAttributes = Components.mappedAttributesAsObject(this, elements.content, {
+            defaultClass: defaultContentClass
+        });
+
+        const titleAttributes = Components.mappedAttributesAsObject(this, elements.title, {
+            defaultClass: defaultTitleClass
+        });
+
+        const withclose = Components.attributeBooleanValueOrDefault(this, attributes.withClose, true);
+        let close = null;
+        if (withclose) {
+            const closeIcon = Components.attributeValueOrDefault(this, attributes.closeIcon, defaultCloseIcon);
+            const closeAttributes = Components.mappedAttributesAsObject(this, elements.close, { defaultClass: defaultCloseClass });
+            close = Components.createElementWithAttributes("span", closeAttributes);
+            close.style = "position: absolute; top: 0; right: 0;";
+            close.innerHTML = closeIcon;
+        }
+
+        const containerZIndex = Components.attributeValueOrDefault(this, attributes.containerZIndex, defaultContainerZIndex);
+        const container = Components.createElementWithAttributes("div", containerAttributes);
+        container.style = `position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: ${containerZIndex}`;
+        container.style.display = "none";
+
+        const content = Components.createElementWithAttributes("div", contentAttributes);
+
+        const titleElement = Components.createElementWithAttributes("div", titleAttributes);
+        titleElement.textContent = title;
+
+        if (close) {
+            content.append(close);
+        }
+        content.append(titleElement);
+        content.append(...this.children);
+
+        const withLeftRightButtons = Components.attributeBooleanValueOrDefault(this, attributes.withLeftRightButtons, true);
+        if (withLeftRightButtons) {
+            content.append(this._leftRightButtons());
+        }
+
+        this._container = container;
+        this._content = content;
+        this._title = titleElement;
+
+        container.append(content);
+        this.append(container);
+
+        this.show = () => this._container.style.display = "block";
+
+        this.hide = e => {
+            if (e == undefined || e.target == this._container) {
+                this.beforeHideListener();
+                if (this.hideDelay > 0) {
+                    setTimeout(() => this._doHide(), this.hideDelay);
+                } else {
+                    this._doHide();
+                }
+            }
+        };
+
+        if (close) {
+            close.onclick = () => this.hide();
+        }
+    }
+
+    _initProperties() {
+        if (!this.hideDelay) {
+            this.hideDelay = 0;
+        }
         if (!this.onLeft) {
             this.onLeft = () => this.hide();
         }
         if (!this.onRight) {
             this.onRight = () => { };
         }
-
-        const hideOnOutsideClick = Components.attributeBooleanValueOrDefault(this, "hide-on-outside-click", false);
-        if (hideOnOutsideClick) {
-            this._dialog.addEventListener("click", this.hide);
+        if (!this.beforeHideListener) {
+            this.beforeHideListener = () => { };
+        }
+        if (!this.afterHideListener) {
+            this.afterHideListener = () => { };
         }
     }
 
-    _render() {
-        const titleToRender = Components.attributeValueOrDefault(this, TITLE_ATTRIBUTE, "Default Title");
-
-        const dialogAttributes = Components.mappedAttributesAsObject(this, "dialog", {
-            defaultClass: dialogClassDefault
-        });
-
-        const titleAttributes = Components.mappedAttributesAsObject(this, "title", { defaultClass: titleClassDefault });
-
-        const closeIcon = Components.attributeValueOrDefault(this, "close-icon", "&times;");
-        const closeAttributes = Components.mappedAttributesAsObject(this, "close", {
-            toAddClass: closeClass,
-            defaultClass: closeClassDefault,
-            toSkipAttributes: ["icon"]
-        });
-
-        const dialog = Components.createElementWithAttributes("dialog", dialogAttributes);
-
-        const close = Components.createElementWithAttributes("span", closeAttributes);
-        close.innerHTML = closeIcon;
-
-        const titleEl = Components.createElementWithAttributes("div", titleAttributes);
-        titleEl.textContent = titleToRender;
-
-        dialog.append(close, titleEl);
-        dialog.append(...this.children);
-
-        const hideLeftRightContainer = Components.attributeBooleanValueOrDefault(this, "hide-left-right-container", "false");
-        if (!hideLeftRightContainer) {
-            dialog.append(this._leftRightContainer());
-        }
-
-        this._dialog = dialog;
-        this._title = titleEl;
-        this._close = close;
-
-        this.append(dialog);
-
-        this.show = () => {
-            this._dialog.showModal();
-        };
-
-        this.hide = e => {
-            if (e == undefined || e.target == this._dialog) {
-                this._dialog.close();
-                window.dispatchEvent(new CustomEvent(HIDDEN_EVENT, { detail: { id: this.id } }));
-            }
-        };
-
-        this._close.onclick = () => {
-            this._dialog.close();
-            window.dispatchEvent(new CustomEvent(HIDDEN_EVENT, { detail: { id: this.id } }));
-        };
+    _doHide() {
+        this._container.style.display = "none";
+        this.afterHideListener();
     }
 
-    _leftRightContainer() {
-        const leftToRender = Components.attributeValueOrDefault(this, "left-text", "Cancel");
-        const rightToRender = Components.attributeValueOrDefault(this, "right-text", "Ok");
+    _leftRightButtons() {
+        const leftRightButtonsContainerAttributes = Components.mappedAttributesAsObject(this, elements.leftRightButtonsContainer);
+        const buttonsContainer = Components.createElementWithAttributes("div", leftRightButtonsContainerAttributes);
+        
+        const withLeftButton = Components.attributeBooleanValueOrDefault(this, attributes.withLeftButton, true);
+        const withRightButton = Components.attributeBooleanValueOrDefault(this, attributes.withRightButton, true);
 
-        const leftRightContainerAttributes = Components.mappedAttributesAsObject(this, "left-right-container", {
-            defaultClass: leftRightButtonsContainerClassDefault
-        });
-
-        const leftAttributes = Components.mappedAttributesAsObject(this, "left", {
-            defaultClass: leftButtonClassDefault
-        });
-        const rightAttributes = Components.mappedAttributesAsObject(this, "right", {
-            defaultClass: rightButtonClassDefault
-        });
-
-        const leftRightContainer = Components.createElementWithAttributes("div", leftRightContainerAttributes);
-        leftRightContainer.style = "display: flex; justify-content: space-between";
-
-        const leftEl = Components.createElementWithAttributes("div", leftAttributes);
-        leftEl.textContent = leftToRender;
-
-        const rightEl = Components.createElementWithAttributes("div", rightAttributes);
-        rightEl.textContent = rightToRender;
-
-        const hideLeftContainer = Components.attributeBooleanValueOrDefault(this, "hide-left-container", "false");
-        const hideRightContainer = Components.attributeBooleanValueOrDefault(this, "hide-right-container", "false");
-
-        if (!hideLeftContainer) {
-            leftRightContainer.append(leftEl);
-            this._left = leftEl;
-            this._left.onclick = () => this.onLeft();
+        let justifyContent;
+        if (withLeftButton && withRightButton) {
+            justifyContent = "space-between";
+        } else if (withLeftButton) {
+            justifyContent = "left";
+        } else {
+            justifyContent = "right";
         }
-        if (!hideRightContainer) {
-            leftRightContainer.append(rightEl);
-            this._right = rightEl;
-            this._right.onclick = () => this.onRight();
+        buttonsContainer.style = `display: flex; justify-content: ${justifyContent}`;
+
+        const leftButtonText = Components.attributeValueOrDefault(this, attributes.leftButtonText, "Cancel");
+        const leftButtonAttributes = Components.mappedAttributesAsObject(this, elements.leftButton, {
+            defaultClass: defaultLeftRightButtonClass
+        });
+
+        const rightButtonText = Components.attributeValueOrDefault(this, attributes.rightButtonText, "Ok");
+        const rightButtonAttributes = Components.mappedAttributesAsObject(this, elements.rightButton, {
+            defaultClass: defaultLeftRightButtonClass
+        });
+
+        if (withLeftButton) {
+            const leftButton = Components.createElementWithAttributes("div", leftButtonAttributes);
+            leftButton.textContent = leftButtonText;
+            buttonsContainer.append(leftButton);
+            leftButton.onclick = () => this.onLeft();
         }
 
-        return leftRightContainer;
+        if (withRightButton) {
+            const rightButton = Components.createElementWithAttributes("div", rightButtonAttributes);
+            rightButton.textContent = rightButtonText;
+            buttonsContainer.append(rightButton);
+            rightButton.onclick = () => this.onRight();
+        }
+
+        return buttonsContainer;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if (!this._dialog) {
+        if (!this._container) {
             return;
         }
-        if (name == TITLE_ATTRIBUTE) {
+        if (name == attributes.title) {
             this._title.textContent = newValue;
         }
-    }
-
-    disconnectedCallback() {
-        // window.removeEventListener(SHOW_EVENT, this._showOnEvent);
     }
 }
 

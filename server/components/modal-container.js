@@ -6,53 +6,68 @@ export const PATH = "/modal-container";
 
 export const router = express.Router();
 
-router.get("/", (req, res) => {
+// Custom close icon was taken from Icons8: https://icons8.com/icon/8112/close
+
+router.get("/", async (req, res) => {
     const body = `
+    <modal-container id="default-modal-container"
+        content:replace:class="w-11/12=w-4/6 bg-white=bg-sky-200"
+        content:add:class="text-slate-600">
+        <span class="italic text-lg mx-4">Some custom content...</span>
+    </modal-container>
+
     <modal-container 
-        id="info-modal"
-        title:class="bg-slate-200 italic text-2xl p-2"
+        id="info-modal-1"
+        title:class="bg-slate-200 italic text-2xl p-2 rounded-t"
         close:add:class="text-slate-600"
-        hide-left-right-container="true"
-        title="Info modal">
-        <div class="p-2">Some information...</div>
+        with-left-right-buttons="false"
+        hide-on-outside-click="true"
+        title="Info Modal 1">
+        <div class="p-2 pb-8">Some information...</div>
     </modal-container>
 
     <modal-container
-        id="highly-customized-info-modal"
-        dialog:class="backdrop:bg-black/80 bg-amber-300 outline-none focus-none border-solid border-4 border-amber-400 rounded-lg m-auto mt-32 px-4 pt-4 pb-8 w-3/5"
-        close-icon="<div class='font-bold'>X</div>"
-        close:class="text-2xl p-4 cursor-pointer"
-        hide-left-right-container="true"
-        title="Custom Title"
-        title:add:class="italic">
-        <div class="text-lg italic">Custom message</div>
+        id="info-modal-2"
+        container:class="bg-black/90"
+        content:class="bg-amber-300 border-4 border-amber-400 rounded-lg m-auto mt-[5vh] p-8 w-3/5 relative"
+        close-icon="<img class='w-10 h-10' src='/assets/close-icon.png' alt='Close'>"
+        close:class="cursor-pointer p-2"
+        with-left-right-buttons="false"
+        hide-on-outside-click="true"
+        title="Info Modal 2"
+        title:class="italic text-3xl font-bold">
+        <div class="text-xl italic py-8">Custom message</div>
     </modal-container>
 
     <modal-container 
         id="error-modal" 
         title:add:class="text-red-500"
-        hide-left-right-container="true"
-        hide-on-outside-click="false">
-        <div class="px-2 pb-4">Some error information...</div>
+        with-left-right-buttons="false">
+        <div class="px-4 pb-16">Some error information...</div>
     </modal-container>
 
     <modal-container
         id="confirmation-modal"
-        title="Dangerous, Delete Action"
-        left-text="No"
-        right-text="Yes">
-        <div class="text-lg italic px-2"></div>
+        title="Dangerous Delete Action"
+        left-button-text="No"
+        right-button-text="Yes"
+        with-close="false">
+        <div class="text-lg italic px-4"></div>
     </modal-container>
 
     <modal-container 
-        id="input-modal-container"
-        title="Some Food Item" left-text="Cancel" right-text="Add" 
-        left-right-container:class="mt-8"
-        left:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
-        right:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
-        hx-post="${PATH}/food-items" hx-trigger="add-food-item-trigger" hx-include="this">
+        id="input-modal-1"
+        title="Some Food Item" 
+        left-button-text="Cancel" right-button-text="Add" 
+        left-right-buttons-container:class="mt-8 pb-4 px-4"
+        left-button:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
+        right-button:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
+        hx-post="${PATH}/food-items" 
+        hx-trigger="add-food-item-trigger"
+        hx-include="this"
+        hx-target="#input-modal-1-result">
       <input-with-error 
-        container:class="mt-4 mx-2"
+        container:class="mt-4 mx-4"
         input:add:class="w-full"
         input:type="text"
         input:name="kcals"
@@ -63,7 +78,7 @@ router.get("/", (req, res) => {
         input:hx-target="next input-error">
       </input-with-error>
       <input-with-error 
-        container:class="mt-4 mx-2"
+        container:class="mt-4 mx-4"
         input:add:class="w-full"
         input:type="text"
         input:name="protein"
@@ -75,141 +90,50 @@ router.get("/", (req, res) => {
       </input-with-error>
     </modal-container>
 
-    <modal-container id="input-modal-2">
-        <drop-down container:add:class="px-2 pb-16"
-            option-0-text="option-1"
-            option-1-text="option-2"
-            option-2-text="option-3"
-            option-3-text="option-4">
+    <modal-container id="input-modal-2" title="Some Pet">
+     <div class="mx-4">
+        <drop-down container:add:class="w-full"   
+            title:add:class="bg-slate-50 px-2 rounded border-2 rounded"
+            options:add:class="bg-white border-b-2 border-x-2 rounded"
+            option-0-text="Dog"
+            option-1-text="Cat"
+            option-2-text="Bear"
+            option-3-text="Dinosaur">
         </drop-down>
+        </div>
     </modal-container>
 
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-info-modal">Show InfoModal</button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-highly-customized-info-modal">Show highly customized InfoModal</button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-error-modal">Show ErrorModal</button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-confirmation-modal">Show ConfirmationModal</button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-confirmation-modal-using-htmx"
+    <button class="long-button-like" id="show-default-modal-container">Show Default Modal Container</button>
+    <button class="long-button-like" id="show-info-modal-1">Show Info Modal 1</button>
+    <button class="long-button-like" id="show-info-modal-2">Show Info Modal 2</button>
+    <button class="long-button-like" id="show-error-modal">Show Error Modal</button>
+    <button class="long-button-like" id="show-confirmation-modal">Show Confirmation Modal</button>
+    <button class="long-button-like" id="show-confirmation-modal-using-htmx"
         hx-delete="${PATH}/confirmation-modal"
-        hx-confirm="Are you sure to delete this test entity?"
+        hx-confirm="Are you sure about deleting this test entity using HTMX?"
         hx-target="#confirmation-modal-result">
-        Show ConfirmationModal using HTMX
+        Show Confirmation Modal using HTMX
     </button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-input-modal">Show InputModal</button>
-    <button class="button-like block my-2 w-full max-w-[600px]" id="show-input-modal-2">Show InputModal 2</button>
+    <button class="long-button-like" id="show-input-modal-1">Show Input Modal 1</button>
+    <button class="long-button-like" id="show-input-modal-2">Show Input Modal 2</button>
 
-    <div id="confirmation-modal-result" class="text-xl font-bold mt-16">Confirmation Modal Result Placeholder</div>
-
-    <div id="input-modal-result" class="text-xl font-bold mt-8">Input Modal Result Placeholder</div>
+    <h2 class="text-xl font-bold mt-16">Confirmation Modal Result:</h2>
+    <div id="confirmation-modal-result"></div>
+    
+    <h2 class="text-xl font-bold mt-8">Input Modal 1 Result:</h2>
+    <div id="input-modal-1-result"></div>
+    
+    <h2 class="text-xl font-bold mt-8">Input Modal 2 Result:</h2>
+    <div id="input-modal-2-result"></div>
     `;
 
-    const script = `
-        const showInfoModal = document.getElementById("show-info-modal");
-        const infoModal = document.getElementById("info-modal");
-        const infoModalMessage = infoModal.querySelector("div");
-
-        const showHighlyCustomizedInfoModal = document.getElementById("show-highly-customized-info-modal");
-        const highlyCustomizedInfoModal = document.getElementById("highly-customized-info-modal");
-
-        const showErrorModal = document.getElementById("show-error-modal");
-        const errorModal = document.getElementById("error-modal");
-        const errorModalMessage = errorModal.querySelector("div");
-
-        const showConfirmationModalButton = document.getElementById("show-confirmation-modal");
-        const showConfirmationModalUsingHtmxButton = document.getElementById("show-confirmation-modal-using-htmx");
-        const confirmationModal = document.getElementById("confirmation-modal");
-        const confirmationModalMessage = confirmationModal.querySelector("div");
-
-        const showInputModalButton = document.getElementById("show-input-modal");
-        const inputModal = document.getElementById("input-modal-container");
-        const [kcalsInput, proteinInput] = inputModal.querySelectorAll("input-with-error");
-
-        const showInputModal2Button = document.getElementById("show-input-modal-2");
-        const inputModal2 = document.getElementById("input-modal-2");
-
-        const confirmationModalResult = document.getElementById("confirmation-modal-result");
-
-        showInfoModal.onclick = () => {
-            infoModal.show();
-        };
-
-        showHighlyCustomizedInfoModal.onclick = () => {
-            highlyCustomizedInfoModal.show();
-        };
-
-        showErrorModal.onclick = () => {
-            errorModal.setAttribute("title", "Something went wrong...");
-            errorModalMessage.textContent = \`Some error occurred at \${Date.now()}\`;
-            errorModal.show();
-        };
-
-        confirmationModal.onLeft = () => {
-            confirmationModal.hide();
-            confirmationModalResult.textContent = "Not Confirmed: " + Date.now();
-        };
-
-        showConfirmationModalButton.onclick = () => {
-            confirmationModalMessage.textContent = "Are you sure?";
-            confirmationModal.onRight = () => {
-                confirmationModalResult.textContent = "Confirmed: " + Date.now();
-                confirmationModal.hide();
-            };
-            confirmationModal.show();
-        };
-        showConfirmationModalUsingHtmxButton.addEventListener("htmx:confirm", e => {
-            console.log("Let's confirm htmx request..", e);
-            
-            // do not issue htmx request
-            e.preventDefault();
-
-            confirmationModalMessage.textContent = e.detail.question;
-
-            confirmationModal.onRight = () => {
-                e.detail.issueRequest(e);
-                confirmationModal.hide();
-            };
-
-
-            confirmationModal.show();
-        });
-
-        inputModal.onRight = () => {
-            console.log("Right clicked!");
-            // inputModal.hide();
-            document.dispatchEvent(new Event("add-food-item-trigger"));
-            inputModal.dispatchEvent(new Event("add-food-item-trigger"));
-        };
-
-        showInputModalButton.onclick = () => {
-            kcalsInput.clear();
-            proteinInput.clear();
-            inputModal.show();
-        };
-
-        showInputModal2Button.onclick = () => {
-            inputModal2.show();
-        };
-
-        window.addEventListener("input-modal-container-hidden", e => {
-            console.log("Input modal container was hidden!");
-        });
-
-        inputModal.addEventListener("htmx:afterRequest", e => {
-            console.log("Input modal, after request...", e.detail);
-            if (e.detail.failed) {
-                const response = e.detail.xhr.responseText;
-                const [kcalsError, proteinError] = response.split('||');
-                console.log("Error response:", kcalsError, proteinError);
-                kcalsInput.onInputValidated(kcalsError);
-                proteinInput.onInputValidated(proteinError);
-            }
-        });
-    `;
+    const script = await Web.assetsFileContent("modal-container-page.js");
 
     Web.returnHtml(res, Web.htmlPage(body, NAME, script, ["input-error", "input-with-error", "drop-down"]));
 });
 
 router.delete(`/confirmation-modal`, (req, res) => {
-    Web.returnText(res, `HTMX Confirmed: ${Date.now()}`);
+    Web.returnText(res, `HTMX Confirmed: ${new Date().toISOString()}`);
 });
 
 router.post(`/food-items/validate-kcals`, (req, res) => {
@@ -243,10 +167,8 @@ router.post("/food-items", (req, res) => {
     const kcalsError = validateKcals(kcals);
     const proteinError = validatProtein(protein);
     if (!kcalsError && !proteinError) {
-        // TODO: do add food item
-        console.log("Adding food item...");
-        Web.returnText(res, "OK", 201);
+        Web.returnText(res, `Food item with ${kcals} kcals and ${protein} protein`, 201);
     } else {
-        Web.returnText(res,`${kcalsError}||${proteinError}`, 400);
+        Web.returnJson(res, { kcals: kcalsError, protein: proteinError }, 400);
     }
 });
