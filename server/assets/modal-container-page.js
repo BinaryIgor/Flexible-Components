@@ -7,46 +7,46 @@ const fadeOutLongDelay = 1500;
 
 function setupDefaultModalContainer() {
     const defaultModalContainer = document.getElementById("default-modal-container");
-    document.getElementById("show-default-modal-container").onclick = () => defaultModalContainer.show();
-}
-
-function setupFadeInOutModal({ modal, showModal, modalHideDelay, fadeInClass, fadeOutClass }) {
-    modal.hideDelay = modalHideDelay;
-    modal.beforeHideListener = () => modal.classList.add(fadeOutClass);
-    modal.afterHideListener = () => {
-        modal.classList.remove(fadeOutClass);
-        modal.classList.remove(fadeInClass);
-    };
-    showModal.onclick = () => {
-        modal.show();
-        modal.classList.add(fadeInClass);
-    };
+    document.getElementById("show-default-modal-container")
+        .onclick = () => defaultModalContainer.show();
 }
 
 function setupInfoModal1() {
     const showInfoModal1 = document.getElementById("show-info-modal-1");
     const infoModal1 = document.getElementById("info-modal-1");
 
-    setupFadeInOutModal({
-        modal: infoModal1,
-        showModal: showInfoModal1,
-        modalHideDelay: fadeOutDelay,
-        fadeInClass: fadeInClass,
-        fadeOutClass: fadeOutClass
-    });
+    showInfoModal1.onclick = () => {
+        infoModal1.show();
+        infoModal1.classList.add(fadeInClass);
+    };
+
+    infoModal1.hideDelay = fadeOutDelay;
+    infoModal1.beforeHideListener = () => {
+        infoModal1.classList.add(fadeOutClass);
+    };
+    infoModal1.afterHideListener = () => {
+        infoModal1.classList.remove(fadeOutClass);
+        infoModal1.classList.remove(fadeInClass);
+    };
 }
 
 function setupInfoModal2() {
     const showInfoModal2 = document.getElementById("show-info-modal-2");
     const infoModal2 = document.getElementById("info-modal-2");
 
-    setupFadeInOutModal({
-        modal: infoModal2,
-        showModal: showInfoModal2,
-        modalHideDelay: fadeOutLongDelay,
-        fadeInClass: fadeInLongClass,
-        fadeOutClass: fadeOutLongClass
-    });
+    showInfoModal2.onclick = () => {
+        infoModal2.show();
+        infoModal2.classList.add(fadeInLongClass);
+    };
+
+    infoModal2.hideDelay = fadeOutLongDelay;
+    infoModal2.beforeHideListener = () => {
+        infoModal2.classList.add(fadeOutLongClass);
+    };
+    infoModal2.afterHideListener = () => {
+        infoModal2.classList.remove(fadeOutLongClass);
+        infoModal2.classList.remove(fadeInLongClass);
+    };
 }
 
 function setupErrorModal() {
@@ -56,7 +56,7 @@ function setupErrorModal() {
 
     showErrorModal.onclick = () => {
         errorModal.setAttribute("title", "Something went wrong...");
-        errorModalMessage.textContent = `Some error occurred at ${new Date().toISOString()}`;
+        errorModalMessage.textContent = `Some error occurred: ${new Date().toISOString()}`;
         errorModal.show();
     };
 }
@@ -69,34 +69,36 @@ function setupConfirmationModal() {
 
     const confirmationModalResult = document.getElementById("confirmation-modal-result");
 
-    confirmationModal.onLeft = () => {
-        confirmationModal.hide();
-        confirmationModalResult.textContent = "Not Confirmed: " + new Date().toISOString();
-    };
-
     showConfirmationModal.onclick = () => {
-        confirmationModalMessage.textContent = "Are you sure?";
-        confirmationModal.onRight = () => {
-            confirmationModalResult.textContent = "Confirmed: " + new Date().toISOString();
+        confirmationModal.onLeft = () => {
             confirmationModal.hide();
+            confirmationModalResult.textContent = `Not confirmed at ${new Date().toISOString()}`;
         };
+        confirmationModal.onRight = () => {
+            confirmationModal.hide();
+            confirmationModalResult.textContent = `Confirmed at ${new Date().toISOString()}`;
+        };
+
+        confirmationModalMessage.textContent = "Are you sure?";
         confirmationModal.show();
     };
 
     showConfirmationModalUsingHtmx.addEventListener("htmx:confirm", e => {
-        console.log("Let's confirm htmx request..", e);
-
         // do not issue htmx request
         e.preventDefault();
 
+        confirmationModal.onLeft = () => {
+            confirmationModal.hide();
+            confirmationModalResult.textContent = `HTMX not confirmed at ${new Date().toISOString()}`;
+        };
+
         confirmationModalMessage.textContent = e.detail.question;
+        confirmationModal.show();
 
         confirmationModal.onRight = () => {
             e.detail.issueRequest(e);
             confirmationModal.hide();
         };
-
-        confirmationModal.show();
     });
 }
 
@@ -107,20 +109,15 @@ function setupInputModal1() {
 
     let addFoodItemClicked = false;
 
-    showInputModal1.onclick = () => {
-        addFoodItemClicked = false;
-        kcalsInput.clear();
-        proteinInput.clear();
-        inputModal1.show();
-    };
-
     inputModal1.onRight = () => {
         addFoodItemClicked = true;
         inputModal1.dispatchEvent(new Event("add-food-item-trigger"));
     };
 
-    inputModal1.afterHideListener = () => {
-        console.log("Input modal container was hidden!");
+    showInputModal1.onclick = () => {
+        kcalsInput.clear();
+        proteinInput.clear();
+        inputModal1.show();
     };
 
     inputModal1.addEventListener("htmx:afterRequest", e => {
@@ -145,24 +142,23 @@ function setupInputModal2() {
 
     let inputModal2ChosenOption = null;
 
+    inputModal2Dropdown.addEventListener("drop-down-option-chosen", e => {
+        inputModal2ChosenOption = e.detail.text;
+        inputModal2Dropdown.setAttribute("title", inputModal2ChosenOption);
+    });
+
     showInputModal2.onclick = () => {
         inputModal2ChosenOption = null;
         inputModal2Dropdown.setAttribute("title", "Choose something...");
         inputModal2.show();
-    };
+    }
 
     inputModal2.onRight = () => {
         if (inputModal2ChosenOption) {
             inputModal2.hide();
-            inputModal2Result.textContent = `${inputModal2ChosenOption.text} was the last chosen option`;
+            inputModal2Result.textContent = "Last chosen option: " + inputModal2ChosenOption;
         }
     };
-
-    inputModal2Dropdown.addEventListener("drop-down-option-chosen", e => {
-        console.log("Option choosen...", e);
-        inputModal2ChosenOption = e.detail;
-        inputModal2Dropdown.setAttribute("title", e.detail.text);
-    });
 }
 
 setupDefaultModalContainer();

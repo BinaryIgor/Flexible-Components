@@ -10,32 +10,28 @@ export const router = express.Router();
 
 router.get("/", async (req, res) => {
     const body = `
-    <modal-container id="default-modal-container"
-        content:replace:class="w-11/12=w-4/6 bg-white=bg-sky-200"
-        content:add:class="text-slate-600">
-        <span class="italic text-lg mx-4">Some custom content...</span>
+    <modal-container id="default-modal-container">
     </modal-container>
 
     <modal-container 
         id="info-modal-1"
-        title:class="bg-slate-200 italic text-2xl p-2 rounded-t"
-        close:add:class="text-slate-600"
+        title="Info Modal 1"
+        title:add:class="bg-slate-200 rounded-t"
         with-left-right-buttons="false"
-        hide-on-outside-click="true"
-        title="Info Modal 1">
-        <div class="p-2 pb-8">Some information...</div>
+        hide-on-outside-click="true">
+        <div class="p-4 italic">Some information 1</div>
     </modal-container>
 
     <modal-container
         id="info-modal-2"
-        container:class="bg-black/90"
-        content:class="bg-amber-300 border-4 border-amber-400 rounded-lg m-auto mt-[5vh] p-8 w-3/5 relative"
-        close-icon="<img class='w-10 h-10' src='/assets/close-icon.png' alt='Close'>"
-        close:class="cursor-pointer p-2"
-        with-left-right-buttons="false"
-        hide-on-outside-click="true"
         title="Info Modal 2"
-        title:class="italic text-3xl font-bold">
+        title:class="font-bold text-3xl italic"
+        container:class="bg-black/90"
+        content:class="max-w-lg w-11/12 rounded relative m-auto mt-[10vh] bg-amber-300 border-amber-400 border-4 p-8"
+        hide-on-outside-click="true"
+        with-left-right-buttons="false"
+        close:class="p-2"
+        close-icon="<img class='w-10 h-10' src='/assets/close-icon.png' alt='Close'>">
         <div class="text-xl italic py-8">Custom message</div>
     </modal-container>
 
@@ -43,22 +39,21 @@ router.get("/", async (req, res) => {
         id="error-modal" 
         title:add:class="text-red-500"
         with-left-right-buttons="false">
-        <div class="px-4 pb-16">Some error information...</div>
+        <div class="px-4 pb-12"></div>
     </modal-container>
 
     <modal-container
         id="confirmation-modal"
         title="Dangerous Delete Action"
+        with-close="false"
         left-button-text="No"
-        right-button-text="Yes"
-        with-close="false">
-        <div class="text-lg italic px-4"></div>
+        right-button-text="Yes">
+        <div class="px-4 italic text-lg"></div>
     </modal-container>
 
     <modal-container 
         id="input-modal-1"
         title="Some Food Item" 
-        left-button-text="Cancel" right-button-text="Add" 
         left-right-buttons-container:class="mt-8 pb-4 px-4"
         left-button:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
         right-button:class="bg-slate-100 py-2 text-center min-w-24 w-2/5 text-lg cursor-pointer rounded"
@@ -66,28 +61,28 @@ router.get("/", async (req, res) => {
         hx-trigger="add-food-item-trigger"
         hx-include="this"
         hx-target="#input-modal-1-result">
-      <input-with-error 
-        container:class="mt-4 mx-4"
-        input:add:class="w-full"
-        input:type="text"
-        input:name="kcals"
-        input:placeholder="Input some calories..."
-        input:hx-post="${PATH}/food-items/validate-kcals"
-        input:hx-trigger="input changed delay:500ms"
-        input:hx-swap="outerHTML"
-        input:hx-target="next input-error">
-      </input-with-error>
-      <input-with-error 
-        container:class="mt-4 mx-4"
-        input:add:class="w-full"
-        input:type="text"
-        input:name="protein"
-        input:placeholder="Input some protein..."
-        input:hx-post="${PATH}/food-items/validate-protein"
-        input:hx-trigger="input changed delay:500ms"
-        input:hx-swap="outerHTML"
-        input:hx-target="next input-error">
-      </input-with-error>
+        <input-with-error 
+            container:class="mt-4 mx-4"
+            input:add:class="w-full"
+            input:type="text"
+            input:name="kcals"
+            input:placeholder="Input some calories..."
+            input:hx-post="${PATH}/food-items/validate-kcals"
+            input:hx-trigger="input changed delay:500ms"
+            input:hx-swap="outerHTML"
+            input:hx-target="next input-error">
+        </input-with-error>
+        <input-with-error 
+            container:class="mt-4 mx-4"
+            input:add:class="w-full"
+            input:type="text"
+            input:name="protein"
+            input:placeholder="Input some protein..."
+            input:hx-post="${PATH}/food-items/validate-protein"
+            input:hx-trigger="input changed delay:500ms"
+            input:hx-swap="outerHTML"
+            input:hx-target="next input-error">
+        </input-with-error>
     </modal-container>
 
     <modal-container id="input-modal-2" title="Some Pet">
