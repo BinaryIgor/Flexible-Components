@@ -38,6 +38,12 @@ export class InputWithError extends HTMLElement {
             this.onInputChanged(this._input.value);
         });
     }
+
+    clear() {
+        this._input.value = "";
+        this._inputError = this.querySelector("input-error");
+        this._inputError.setAttribute("message", "");
+    }
 }
 
 customElements.define("input-with-error", InputWithError);

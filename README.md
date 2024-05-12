@@ -17,11 +17,10 @@ npm run build:run
 Output logs will guide you:
 ```
 Available components: 
-* http://localhost:8080/info-modal
-* http://localhost:8080/confirmable-modal
 * http://localhost:8080/input-with-error
 * http://localhost:8080/form-container
-* http://localhost:8080/input-modal-container
+* http://localhost:8080/modal-container
+* http://localhost:8080/drop-down
 * http://localhost:8080/experiments
 
 Server has started on port 8080!
@@ -54,8 +53,8 @@ When it comes to the design and general approach, the most important principles 
 * The only external dependency used is *Tailwind CSS*; it makes default styling significantly easier to implement
 * Don't use *Shadow DOM* - it's complicated and doesn't work with *HTMX* and we are keen on supporting it
 * Every component should allow to override `class` attribute of any of its elements - there is a specific naming convention for it
-* Every component should allow to add arbitrary class to `class` attribute to any of its elements - there is also a specific naming convention for it
-* Every component should allow to set arbitrary attributes on any of its elements - there is also a specific naming convention for it
+* Every component should allow to add arbitrary class to `class` attribute to any of its elements and to replace it - there is also a specific naming convention for it
+* Every component should allow to set, add and replace arbitrary attributes on any of its elements - there is also a specific naming convention for it
 * Reusable functions are all defined in the `base.js` file on which every component can depend
 
 It's extremely versatile and flexible approach; it allows to create reusable components that can be styled and configured from the outside almost without any limits. If you are interested in more details about this approach and how it plays nicely with HTMX, read this blog post: https://binaryigor.com/htmx-and-web-components-a-perfect-match.html
@@ -78,8 +77,13 @@ Some examples of naming conventions:
     error:class="italic text-lg text-red-600">
 </input-with-error>
 
-<info-modal id="error-modal" title:add:class="text-red-500">
-</info-modal>
+<modal-container 
+    id="error-modal" 
+    title:add:class="text-red-500"
+    content:replace:class="bg-white=bg-amber-300 max-w-lg="
+    with-left-right-buttons="false">
+    <div class="px-4 pb-16">Some error information...</div>
+</modal-container>
 ```
 Basically:
 * `{element}:{attribute}` will set *attribute* on *element* inside Web Component

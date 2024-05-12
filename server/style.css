@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .button-like {
+        @apply rounded-md border-slate-200 border-2 px-8 py-2 cursor-pointer bg-white font-bold outline-none;
+    }
+    
+    .long-button-like {
+        @apply button-like block my-2 w-full max-w-[600px];
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.fade-in {
+    animation: fade-in 500ms;
+    animation-fill-mode: forwards;
+}
+
+.fade-out {
+    animation: fade-out 500ms;
+    animation-fill-mode: forwards;
+}
+
+.fade-in-long {
+    animation: fade-in 1500ms;
+    animation-fill-mode: forwards;
+}
+
+.fade-out-long {
+    animation: fade-out 1500ms;
+    animation-fill-mode: forwards;
+}
