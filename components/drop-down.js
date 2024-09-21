@@ -96,14 +96,14 @@ class DropDown extends HTMLElement {
     _optionItemsHTML() {
         let optionItems;
         if (this._options) {
-            optionItems = this._optionItemsFromPropery(this._options);
+            optionItems = this._optionItemsFromProperty(this._options);
         } else {
             optionItems = this._optionItemsFromAttributes();
         }
         return optionItems.join("\n");
     }
 
-    _optionItemsFromPropery(options) {
+    _optionItemsFromProperty(options) {
         const optionItems = [];
 
         const defaultOptionAttributes = Components.mappedAttributesAsObject(this, elements.option, {
