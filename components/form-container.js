@@ -46,7 +46,6 @@ class FormContainer extends HTMLElement {
 
     clearInputs() {
         const inputs = [...this.querySelectorAll(`input:not([type="submit"])`)];
-        console.log("Clear inputs...", inputs);
         inputs.forEach(i => {
             i.value = "";
         });
