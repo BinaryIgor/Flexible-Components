@@ -29,9 +29,9 @@ router.get("/", (req, res) => {
             customMessage.setAttribute("message", "Another message");
         }, 1000);
 
-        setTimeout(() => {
-            customMessageContainer.innerHTML = "Gone";
-        }, 2000);
+        // setTimeout(() => {
+        //     customMessageContainer.innerHTML = "Gone";
+        // }, 2000);
 
         const toFadeInOut = document.getElementById("to-fade-in-out");
         let fadeIn = true;
