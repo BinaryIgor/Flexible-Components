@@ -1,8 +1,8 @@
 import { Components } from "./base.js";
 
-const errorClassDefault = "text-red-500";
-
 export class InputError extends HTMLElement {
+
+    static errorClassDefault = "text-red-500";
 
     static observedAttributes = ["message"];
 
@@ -12,7 +12,7 @@ export class InputError extends HTMLElement {
     }
 
     _render(message) {
-        const errorAttributes = Components.mappedAttributes(this, "error", { defaultClass: errorClassDefault });
+        const errorAttributes = Components.mappedAttributes(this, "error", { defaultClass: InputError.errorClassDefault });
         this.innerHTML = `<p ${message ? `` : `style="display: none"`} ${errorAttributes}>${message}</p>`;
     }
 

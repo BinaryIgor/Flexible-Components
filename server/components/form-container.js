@@ -27,8 +27,10 @@ const orders = [
 
 router.get("/", (req, res) => {
     const body = `
-    <info-modal id="error-modal" title:add:class="text-red-500" title="Something went wrong...">
-    </info-modal>
+    <modal-container id="error-modal" title:add:class="text-red-500" title="Something went wrong..."
+         with-left-right-buttons="false">
+        <div class="px-4 pb-12" id="error-modal-message"></div>
+    </modal-container>
 
     <form-container
         form:id="order-form"
@@ -90,6 +92,7 @@ router.get("/", (req, res) => {
         const withGenericError = withGenericErrorQueryParam == "true" ? true : false;
 
         const errorModal = document.getElementById("error-modal");
+        const errorModalMessage = document.getElementById("error-modal-message");
 
         const formContainer = document.querySelector("form-container");
 
@@ -104,13 +107,14 @@ router.get("/", (req, res) => {
                 const error = e.detail.failed ? e.detail.xhr.response : "";
                 formContainer.afterSubmit({error: error, showGenericError: withGenericError });
                 if (error && !withGenericError) {
-                    errorModal.show({message: error});
+                    errorModalMessage.innerHTML = error;
+                    errorModal.show();
                 }
             }
         });
     `;
 
-    Web.returnHtml(res, Web.htmlPage(body, NAME, script, ["input-error", "input-with-error", "info-modal"]));
+    Web.returnHtml(res, Web.htmlPage(body, NAME, script, ["input-error", "input-with-error", "modal-container"]));
 });
 
 function inputWithErrorHtmxAttributes(validationPost) {

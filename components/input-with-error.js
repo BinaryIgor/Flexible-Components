@@ -1,14 +1,14 @@
 import { Components } from "./base.js";
 
-const inputClassDefault = "rounded p-2 border-2 border-solid border-slate-100 focus:border-slate-300 outline-none";
-
-//Dependencies: registered input-error
+// Dependencies: registered input-error
 export class InputWithError extends HTMLElement {
+
+    static defaultInputClass = "rounded p-2 border-2 border-solid border-slate-100 focus:border-slate-300 outline-none";
 
     connectedCallback() {
         const containerAttributes = Components.mappedAttributes(this, "container");
         const inputAttributes = Components.mappedAttributes(this, "input", {
-            defaultClass: inputClassDefault
+            defaultClass: InputWithError.defaultInputClass
         });
         const inputErrorAttributes = Components.mappedAttributes(this, "input-error");
         const errorAttributes = Components.mappedAttributes(this, "error");
