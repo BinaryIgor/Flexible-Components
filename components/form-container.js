@@ -1,15 +1,15 @@
 import { Components } from "./base.js";
 
-const genericErrorClassDefault = "text-red-600 text-lg italic mt-4 my-2";
-const hiddenClass = "hidden";
-
 class FormContainer extends HTMLElement {
+
+    static genericErrorClassDefault = "text-red-600 text-lg italic mt-4 my-2";
+    static hiddenClass = "hidden";
 
     connectedCallback() {
         const formAttributes = Components.mappedAttributesAsObject(this, "form");
         const errorAttributes = Components.mappedAttributesAsObject(this, "generic-error", {
-            defaultClass: genericErrorClassDefault,
-            toAddClass: hiddenClass
+            defaultClass: FormContainer.genericErrorClassDefault,
+            toAddClass: FormContainer.hiddenClass
         });
         const submitAttributes = Components.mappedAttributesAsObject(this, "submit", {
             defaultAttributes: {
@@ -60,9 +60,9 @@ class FormContainer extends HTMLElement {
 
         if (error && showGenericError) {
             this._genericError.textContent = error;
-            this._genericError.classList.remove(hiddenClass);
+            this._genericError.classList.remove(FormContainer.hiddenClass);
         } else {
-            this._genericError.classList.add(hiddenClass);
+            this._genericError.classList.add(FormContainer.hiddenClass);
         }
     }
 }

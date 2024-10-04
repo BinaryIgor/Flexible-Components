@@ -1,75 +1,75 @@
 import { Components } from "./base.js";
 
-const defaultContainerZIndex = "10";
-const defaultContainerClass = "bg-black/70";
-const defaultContentClass = "max-w-lg w-11/12 rounded top-1/2 left-1/2 absolute -translate-x-1/2 -translate-y-1/2 bg-white";
-const defaultTitleClass = "text-xl font-bold p-4";
-const defaultCloseClass = "cursor-pointer text-4xl px-2";
-const defaultCloseIcon = "&times;";
-const defaultLeftRightButtonClass = "cursor-pointer text-lg p-4";
-
-const attributes = {
-    containerZIndex: "container-z-index",
-    title: "title",
-    withClose: "with-close",
-    closeIcon: "close-icon",
-    withLeftRightButtons: "with-left-right-buttons",
-    withLeftButton: "with-left-button",
-    withRightButton: "with-right-button",
-    leftButtonText: "left-button-text",
-    rightButtonText: "right-button-text",
-    hideOnOutsideClick: "hide-on-outside-click"
-};
-
-const elements = {
-    container: "container",
-    content: "content",
-    title: "title",
-    close: "close",
-    leftRightButtonsContainer: "left-right-buttons-container",
-    leftButton: "left-button",
-    rightButton: "right-button"
-};
-
 class ModalContainer extends HTMLElement {
 
-    static observedAttributes = [attributes.title];
+    static defaultContainerZIndex = "10";
+    static defaultContainerClass = "bg-black/70";
+    static defaultContentClass = "max-w-lg w-11/12 rounded top-1/2 left-1/2 absolute -translate-x-1/2 -translate-y-1/2 bg-white";
+    static defaultTitleClass = "text-xl font-bold p-4";
+    static defaultCloseClass = "cursor-pointer text-4xl px-2";
+    static defaultCloseIcon = "&times;";
+    static defaultLeftRightButtonClass = "cursor-pointer text-lg p-4";
+
+    static attributes = {
+        containerZIndex: "container-z-index",
+        title: "title",
+        withClose: "with-close",
+        closeIcon: "close-icon",
+        withLeftRightButtons: "with-left-right-buttons",
+        withLeftButton: "with-left-button",
+        withRightButton: "with-right-button",
+        leftButtonText: "left-button-text",
+        rightButtonText: "right-button-text",
+        hideOnOutsideClick: "hide-on-outside-click"
+    };
+
+    static elements = {
+        container: "container",
+        content: "content",
+        title: "title",
+        close: "close",
+        leftRightButtonsContainer: "left-right-buttons-container",
+        leftButton: "left-button",
+        rightButton: "right-button"
+    };
+
+    static observedAttributes = [ModalContainer.attributes.title];
 
     connectedCallback() {
         this._render();
         this._initProperties();
 
-        const hideOnOutsideClick = Components.attributeBooleanValueOrDefault(this, attributes.hideOnOutsideClick, false);
+        const hideOnOutsideClick = Components.attributeBooleanValueOrDefault(this, ModalContainer.attributes.hideOnOutsideClick, false);
         if (hideOnOutsideClick) {
             this._container.addEventListener("click", this.hide);
         }
     }
 
     _render() {
-        const title = Components.attributeValueOrDefault(this, attributes.title, "Modal Container");
+        const title = Components.attributeValueOrDefault(this, ModalContainer.attributes.title, "Modal Container");
 
-        const containerAttributes = Components.mappedAttributesAsObject(this, elements.container, {
-            defaultClass: defaultContainerClass
+        const containerAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.container, {
+            defaultClass: ModalContainer.defaultContainerClass
         });
-        const contentAttributes = Components.mappedAttributesAsObject(this, elements.content, {
-            defaultClass: defaultContentClass
-        });
-
-        const titleAttributes = Components.mappedAttributesAsObject(this, elements.title, {
-            defaultClass: defaultTitleClass
+        const contentAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.content, {
+            defaultClass: ModalContainer.defaultContentClass
         });
 
-        const withclose = Components.attributeBooleanValueOrDefault(this, attributes.withClose, true);
+        const titleAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.title, {
+            defaultClass: ModalContainer.defaultTitleClass
+        });
+
+        const withclose = Components.attributeBooleanValueOrDefault(this, ModalContainer.attributes.withClose, true);
         let close = null;
         if (withclose) {
-            const closeIcon = Components.attributeValueOrDefault(this, attributes.closeIcon, defaultCloseIcon);
-            const closeAttributes = Components.mappedAttributesAsObject(this, elements.close, { defaultClass: defaultCloseClass });
+            const closeIcon = Components.attributeValueOrDefault(this, ModalContainer.attributes.closeIcon, ModalContainer.defaultCloseIcon);
+            const closeAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.close, { defaultClass: ModalContainer.defaultCloseClass });
             close = Components.createElementWithAttributes("span", closeAttributes);
             close.style = "position: absolute; top: 0; right: 0;";
             close.innerHTML = closeIcon;
         }
 
-        const containerZIndex = Components.attributeValueOrDefault(this, attributes.containerZIndex, defaultContainerZIndex);
+        const containerZIndex = Components.attributeValueOrDefault(this, ModalContainer.attributes.containerZIndex, ModalContainer.defaultContainerZIndex);
         const container = Components.createElementWithAttributes("div", containerAttributes);
         container.style = `position: fixed; top: 0; left: 0; height: 100%; width: 100%; z-index: ${containerZIndex}`;
         container.style.display = "none";
@@ -85,7 +85,7 @@ class ModalContainer extends HTMLElement {
         content.append(titleElement);
         content.append(...this.children);
 
-        const withLeftRightButtons = Components.attributeBooleanValueOrDefault(this, attributes.withLeftRightButtons, true);
+        const withLeftRightButtons = Components.attributeBooleanValueOrDefault(this, ModalContainer.attributes.withLeftRightButtons, true);
         if (withLeftRightButtons) {
             content.append(this._leftRightButtons());
         }
@@ -139,11 +139,11 @@ class ModalContainer extends HTMLElement {
     }
 
     _leftRightButtons() {
-        const leftRightButtonsContainerAttributes = Components.mappedAttributesAsObject(this, elements.leftRightButtonsContainer);
+        const leftRightButtonsContainerAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.leftRightButtonsContainer);
         const buttonsContainer = Components.createElementWithAttributes("div", leftRightButtonsContainerAttributes);
-        
-        const withLeftButton = Components.attributeBooleanValueOrDefault(this, attributes.withLeftButton, true);
-        const withRightButton = Components.attributeBooleanValueOrDefault(this, attributes.withRightButton, true);
+
+        const withLeftButton = Components.attributeBooleanValueOrDefault(this, ModalContainer.attributes.withLeftButton, true);
+        const withRightButton = Components.attributeBooleanValueOrDefault(this, ModalContainer.attributes.withRightButton, true);
 
         let justifyContent;
         if (withLeftButton && withRightButton) {
@@ -155,14 +155,14 @@ class ModalContainer extends HTMLElement {
         }
         buttonsContainer.style = `display: flex; justify-content: ${justifyContent}`;
 
-        const leftButtonText = Components.attributeValueOrDefault(this, attributes.leftButtonText, "Cancel");
-        const leftButtonAttributes = Components.mappedAttributesAsObject(this, elements.leftButton, {
-            defaultClass: defaultLeftRightButtonClass
+        const leftButtonText = Components.attributeValueOrDefault(this, ModalContainer.attributes.leftButtonText, "Cancel");
+        const leftButtonAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.leftButton, {
+            defaultClass: ModalContainer.defaultLeftRightButtonClass
         });
 
-        const rightButtonText = Components.attributeValueOrDefault(this, attributes.rightButtonText, "Ok");
-        const rightButtonAttributes = Components.mappedAttributesAsObject(this, elements.rightButton, {
-            defaultClass: defaultLeftRightButtonClass
+        const rightButtonText = Components.attributeValueOrDefault(this, ModalContainer.attributes.rightButtonText, "Ok");
+        const rightButtonAttributes = Components.mappedAttributesAsObject(this, ModalContainer.elements.rightButton, {
+            defaultClass: ModalContainer.defaultLeftRightButtonClass
         });
 
         if (withLeftButton) {
@@ -186,7 +186,7 @@ class ModalContainer extends HTMLElement {
         if (!this._container) {
             return;
         }
-        if (name == attributes.title) {
+        if (name == ModalContainer.attributes.title) {
             this._title.textContent = newValue;
         }
     }
